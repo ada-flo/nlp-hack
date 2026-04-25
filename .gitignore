@@ -1,0 +1,23 @@
+# Raw and intermediate datasets — do not commit.
+data/raw/
+data/raw_manual/
+data/interim/
+
+# Bulky archives and tabular dumps.
+*.zip
+*.tar.gz
+*.parquet
+*.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+# Editor / OS
+.DS_Store
+.idea/
+.vscode/
