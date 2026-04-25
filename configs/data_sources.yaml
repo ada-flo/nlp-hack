@@ -1,0 +1,83 @@
+seed: 42
+
+languages:
+  - en
+  - ko
+
+sampling:
+  # Leave null until the final experiment design is decided.
+  target_total_per_language: null
+  source_weights: null
+
+format:
+  add_language_tag: false
+  sep_token: "<SEP>"
+  sos_token: "<SOS>"
+  eos_token: "<EOS>"
+
+filters:
+  min_input_chars: 20
+  min_target_chars: 20
+  max_input_chars: 600
+  max_target_chars: 600
+  max_encoder_tokens: 120
+  max_decoder_tokens: 120
+  reject_same_input_target: true
+  deduplicate_by_normalized_text: true
+
+sources:
+  en:
+    cmv_convokit:
+      enabled: true
+      kind: direct_dialogue
+      path: null
+    ibm_argq_30k:
+      enabled: true
+      kind: stance_pair
+      hf_name: ibm-research/argument_quality_ranking_30k
+    args_me:
+      enabled: true
+      kind: stance_pair
+      hf_name: webis/args_me
+    perspectrum:
+      enabled: true
+      kind: perspective_pair
+      path: null
+    debatesum:
+      enabled: true
+      kind: evidence_summary
+      hf_name: Hellisotherpeople/DebateSum
+    aae2:
+      enabled: false
+      kind: argument_relation
+      hf_name: pie/aae2
+    schopenhauer_debate:
+      enabled: false
+      kind: style_reference
+      hf_name: raphaaal/schopenhauer-debate
+
+  ko:
+    k_news_stance:
+      enabled: true
+      kind: stance_pair
+      path: data/raw_manual/k-news-stance/k-news-stance.json
+    korean_petitions:
+      enabled: true
+      kind: issue_to_synthetic_rebuttal
+      korpora_name: korean_petitions
+    aihub_dialogue_summary:
+      enabled: true
+      kind: direct_dialogue_or_synthetic
+      path: data/raw_manual/aihub/dialogue_summary/
+    aihub_topic_dialogue:
+      enabled: true
+      kind: direct_dialogue
+      path: data/raw_manual/aihub/topic_dialogue/
+    aihub_meeting_speech:
+      enabled: false
+      kind: transcript_dialogue
+      path: data/raw_manual/aihub/meeting_speech/
+    aihub_korean_dialogue:
+      enabled: false
+      kind: auxiliary_dialogue
+      path: data/raw_manual/aihub/korean_dialogue/
