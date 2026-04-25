@@ -29,3 +29,23 @@ src/train.py            # training entry point
 uv sync
 uv run python -m src.preprocess.en_ibm_argq
 ```
+
+## Synthetic data via vLLM
+
+vLLM serves an OpenAI-compatible API, so the same client code targets either a
+local or a remote server — only the URL changes.
+
+```bash
+# Local: launch vLLM on this machine
+vllm serve Qwen/Qwen2.5-7B-Instruct --port 8000
+
+# Then in another shell:
+cp .env.example .env  # edit if remote
+export $(grep -v '^#' .env | xargs)
+uv run python -m src.synth.counterargument  # smoke test
+```
+
+For a remote server, set `VLLM_BASE_URL=https://your-host/v1` in `.env` and
+the same code runs unchanged. See `src/synth/counterargument.py` for the
+sync entry point and `synthesize_counterarguments_async` for batched runs
+with bounded concurrency.

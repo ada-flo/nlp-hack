@@ -17,6 +17,9 @@ __pycache__/
 venv/
 .env
 
+# Local env file (commit .env.example, ignore .env)
+.env
+
 # Editor / OS
 .DS_Store
 .idea/
