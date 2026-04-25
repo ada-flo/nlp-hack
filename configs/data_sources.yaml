@@ -5,9 +5,13 @@ languages:
   - ko
 
 sampling:
-  # Leave null until the final experiment design is decided.
-  target_total_per_language: null
-  source_weights: null
+  target_total_per_language:
+    en: 10000
+    ko: 10000
+  split_ratios:
+    train: 0.8
+    valid: 0.1
+    test: 0.1
 
 format:
   add_language_tag: false
@@ -27,24 +31,42 @@ filters:
 
 sources:
   en:
-    cmv_convokit:
-      enabled: true
-      kind: direct_dialogue
-      path: null
     ibm_argq_30k:
       enabled: true
       kind: stance_pair
       hf_name: ibm-research/argument_quality_ranking_30k
-    args_me:
+      max_records: 6000
+    mc_conversation:
       enabled: true
+      kind: direct_dialogue
+      hf_name: mc-ai/conversation_dataset
+      max_records: 1500
+    isotonic_conversation:
+      enabled: true
+      kind: direct_dialogue
+      hf_name: Isotonic/human_assistant_conversation
+      max_records: 1500
+      topic_override: "casual conversation"
+    casual_conversation:
+      enabled: true
+      kind: direct_dialogue
+      hf_name: SohamGhadge/casual-conversation
+      max_records: 1000
+      topic_override: "casual conversation"
+    cmv_convokit:
+      enabled: false        # plan §6 — wire after baseline
+      kind: direct_dialogue
+      path: null
+    args_me:
+      enabled: false
       kind: stance_pair
       hf_name: webis/args_me
     perspectrum:
-      enabled: true
+      enabled: false
       kind: perspective_pair
       path: null
     debatesum:
-      enabled: true
+      enabled: false
       kind: evidence_summary
       hf_name: Hellisotherpeople/DebateSum
     aae2:
@@ -52,25 +74,27 @@ sources:
       kind: argument_relation
       hf_name: pie/aae2
     schopenhauer_debate:
-      enabled: false
+      enabled: false        # too small; consider as few-shot in synth prompt v2
       kind: style_reference
       hf_name: raphaaal/schopenhauer-debate
 
   ko:
-    k_news_stance:
-      enabled: true
-      kind: stance_pair
-      path: data/raw_manual/k-news-stance/k-news-stance.json
     korean_petitions:
       enabled: true
       kind: issue_to_synthetic_rebuttal
       korpora_name: korean_petitions
+      max_records: 10000
+      requires: vllm
+    k_news_stance:
+      enabled: true              # adapter present, gated on manual data
+      kind: stance_pair
+      path: data/raw_manual/k-news-stance/k-news-stance.json
     aihub_dialogue_summary:
-      enabled: true
+      enabled: true              # adapter present, gated on manual data
       kind: direct_dialogue_or_synthetic
       path: data/raw_manual/aihub/dialogue_summary/
     aihub_topic_dialogue:
-      enabled: true
+      enabled: true              # adapter present, gated on manual data
       kind: direct_dialogue
       path: data/raw_manual/aihub/topic_dialogue/
     aihub_meeting_speech:
