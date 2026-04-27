@@ -5,76 +5,70 @@ that produces a counter-argument given a topic and an opponent's argument.
 
 See `Hackathon and Team Building.pdf` for the full brief.
 
-## Roles
+## Quick start on a fresh server
 
-Per the brief, three roles:
+```bash
+# 1. clone
+git clone git@github.com:ada-flo/nlp-hack.git && cd nlp-hack
 
-- **Data preparation** — see [`docs/plan_gyehun.md`](docs/plan_gyehun.md).
-- **Model development** — `src/model/`, `src/train.py`.
-- **Strategy** — technical report and slides.
+# 2. install uv if needed
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 3. configure env (HF_TOKEN strongly recommended for faster downloads)
+cp .env.example .env
+$EDITOR .env
+
+# 4. (optional) launch vLLM in a separate process / window for KO synth
+bash scripts/launch_vllm.sh                 # serves on :8000
+
+# 5. run the full pipeline
+bash scripts/run_pipeline.sh
+```
+
+That's it. Final data lands at `data/processed/{train,valid,test}.jsonl`.
+
+If `VLLM_BASE_URL` isn't set in `.env`, step 5 still produces ~15K records
+(EN + KLUE-NLI Korean). With vLLM running, KO petitions synth adds ~10K more.
 
 ## Layout
 
 ```text
-configs/                # data_sources.yaml — caps, ratios, source toggles
-data/                   # raw, raw_manual, interim ignored; processed kept
-src/preprocess/         # source-specific adapters + merge_and_split + utils
-src/synth/              # vLLM client + counter-argument synthesis
-src/model/              # LSTM seq2seq (todo)
-src/train.py            # training entry point (todo)
+configs/data_sources.yaml          # caps, split ratios, source toggles
+data/                              # raw/raw_manual/interim ignored; processed kept
+docs/                              # plan, dataset examples
+scripts/run_pipeline.sh            # one-shot pipeline runner
+scripts/launch_vllm.sh             # vLLM server launcher
+src/preprocess/                    # per-source adapters + merge_and_split + utils
+src/synth/                         # vLLM client + counter-argument synthesis
+src/model/                         # LSTM seq2seq (todo)
+src/train.py                       # training entry point (todo)
 ```
 
-## Setup
+## Roles
 
-```bash
-uv sync
-```
+- **Data preparation** — see [`docs/plan_gyehun.md`](docs/plan_gyehun.md) and the
+  no-AI-Hub additions in [`docs/plan_gyehun_revised.md`](docs/plan_gyehun_revised.md).
+- **Model development** — `src/model/`, `src/train.py`.
+- **Strategy** — technical report and slides.
 
-## Data pipeline
+## Data sources
 
-Target: ~10K English + ~10K Korean records.
+Target: ~10K English + ~10K Korean records (caps in `configs/data_sources.yaml`).
 
 | Lang | Source | Cap | Type | Needs |
 |---|---|---|---|---|
-| EN | IBM ArgQ 30K | 6,000 | real pro/con | HF only |
-| EN | mc-ai/conversation_dataset | 1,500 | real dialogue | HF only |
-| EN | Isotonic/human_assistant_conversation | 1,500 | real dialogue | HF only |
-| EN | SohamGhadge/casual-conversation | 1,000 | real dialogue | HF only |
-| KO | KLUE-NLI (HF) | 5,000 | NLI contradiction pairs | HF only (no vLLM) |
-| KO | Korean Petitions (Korpora) | 10,000 | vLLM-synth rebuttal | **vLLM running** |
+| EN | IBM ArgQ 30K | 6,000 | real pro/con | HF |
+| EN | mc-ai/conversation_dataset | 1,500 | real dialogue | HF |
+| EN | Isotonic/human_assistant_conversation | 1,500 | real dialogue | HF |
+| EN | SohamGhadge/casual-conversation | 1,000 | real dialogue | HF |
+| KO | KLUE-NLI | 5,000 | NLI contradiction pairs | HF, no vLLM |
+| KO | Korean Petitions (Korpora) | 10,000 | vLLM-synth rebuttal | **vLLM** |
 | KO | K-News-Stance | best-effort | real stance pairs | manual download |
 | KO | AI Hub Dialogue Summarization | best-effort | real dialogue | manual download |
 | KO | AI Hub Topic Dialogue | best-effort | real dialogue | manual download |
 
-### Run order
-
-```bash
-# English (no external services needed)
-uv run python -m src.preprocess.en_ibm_argq
-uv run python -m src.preprocess.en_mc_conversation
-uv run python -m src.preprocess.en_isotonic_conversation
-uv run python -m src.preprocess.en_casual_conversation
-
-# Korean — runs without vLLM, fast Korean baseline
-uv run python -m src.preprocess.ko_klue_nli
-
-# Korean — start vLLM first (see "Synthetic data via vLLM" below)
-uv run python -m src.preprocess.ko_korean_petitions
-
-# Korean — these skip cleanly if manual data isn't present
-uv run python -m src.preprocess.ko_k_news_stance
-uv run python -m src.preprocess.ko_aihub_dialogue_summary
-uv run python -m src.preprocess.ko_aihub_topic_dialogue
-
-# Merge per-source JSONLs into final train/valid/test (80/10/10)
-uv run python -m src.preprocess.merge_and_split
-```
-
-Outputs land at `data/processed/{train,valid,test}.jsonl`.
-
-### Manual data drop locations
-
-When the manually-downloaded corpora become available:
+Manual-data adapters skip cleanly when their input files are absent — the
+pipeline runs to completion regardless. Drop manual data here when available:
 
 ```text
 data/raw_manual/k-news-stance/k-news-stance.json
@@ -82,30 +76,56 @@ data/raw_manual/aihub/dialogue_summary/<files>.json
 data/raw_manual/aihub/topic_dialogue/<files>.json
 ```
 
-The corresponding adapters detect the path and run automatically.
+## Running adapters individually
 
-## Synthetic data via vLLM
-
-vLLM serves an OpenAI-compatible API, so the same client code targets either a
-local or a remote server — only the URL changes.
+`scripts/run_pipeline.sh` is the recommended path, but each adapter is also
+runnable on its own:
 
 ```bash
-# Launch vLLM (local example)
-vllm serve Qwen/Qwen2.5-7B-Instruct --port 8000
-
-# In another shell:
-cp .env.example .env       # edit VLLM_BASE_URL if remote
-export $(grep -v '^#' .env | xargs)
-uv run python -m src.synth.counterargument   # one-call smoke test
-uv run python -m src.preprocess.ko_korean_petitions  # full 10K run, ~20 min
+uv run python -m src.preprocess.en_ibm_argq
+uv run python -m src.preprocess.ko_klue_nli
+uv run python -m src.preprocess.ko_korean_petitions   # needs vLLM
+uv run python -m src.preprocess.merge_and_split
 ```
 
-For a remote server, set `VLLM_BASE_URL=https://your-host/v1` in `.env` and the
-same code runs unchanged.
+## vLLM setup
+
+vLLM serves an OpenAI-compatible API, so the synthesis client treats local
+and remote servers identically. Only `VLLM_BASE_URL` changes.
+
+```bash
+# On the GPU server (8x B200 example, defaults in scripts/launch_vllm.sh):
+pip install vllm
+bash scripts/launch_vllm.sh
+
+# Override the model:
+VLLM_MODEL=Qwen/Qwen3-72B-Instruct VLLM_TP=4 bash scripts/launch_vllm.sh
+
+# In .env on the machine running the pipeline:
+VLLM_BASE_URL=http://<gpu-host>:8000/v1
+VLLM_MODEL=Qwen/Qwen3-235B-A22B-Instruct
+VLLM_API_KEY=EMPTY
+```
+
+Korean Petitions synth runs ~10K calls with concurrency 16 and chunked writes
+(no progress lost on crash). With Qwen3-235B-A22B on 8 B200s expect ~15–25 min.
 
 ## Topic-leakage rule
 
-Splits are **topic-level** for debate records (every record on motion *X* lands
-in one split — train, valid, *or* test, never two). Casual-conversation
-records share a placeholder topic so they're split row-wise to spread fluency
-examples across all three. Implemented in `src/preprocess/merge_and_split.py`.
+Splits are **topic-level** for debate records (every record on a given motion
+lands in exactly one of train/valid/test, never two). Sources with a uniform
+placeholder topic — casual chat and KLUE-NLI — split row-wise instead via an
+explicit allowlist in `src/preprocess/merge_and_split.py`. Without that
+distinction, all 5K NLI rows would land in a single split.
+
+## Troubleshooting
+
+- **HF rate limits / slow downloads** → set `HF_TOKEN` in `.env`.
+- **`SSL: CERTIFICATE_VERIFY_FAILED`** (Korpora) → `pip install --upgrade
+  certifi`, then `export SSL_CERT_FILE=$(python -c 'import certifi;
+  print(certifi.where())')`. Linux servers typically don't hit this; macOS
+  may need `Install Certificates.command`.
+- **`ko_korean_petitions.py` fails preflight** → vLLM isn't reachable at
+  `VLLM_BASE_URL`. Confirm with `curl $VLLM_BASE_URL/models`.
+- **Mismatched `Generating validation split` schema** (Isotonic) → already
+  handled with streaming load.
