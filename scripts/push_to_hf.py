@@ -24,9 +24,22 @@ from datasets import Dataset, DatasetDict
 PROCESSED_DIR = Path("data/processed")
 
 
+def _flatten(record: dict) -> dict:
+    """Promote universally-useful meta fields to top-level so they're
+    filterable in the HF dataset viewer. Source-specific extras stay in `meta`.
+    """
+    meta = dict(record.get("meta") or {})
+    record["is_synthetic"] = bool(meta.pop("is_synthetic", False))
+    record["input_stance"] = meta.pop("input_stance", None)
+    record["target_stance"] = meta.pop("target_stance", None)
+    record["meta"] = meta
+    return record
+
+
 def _load_split(name: str) -> Dataset:
     path = PROCESSED_DIR / f"{name}.jsonl"
-    return Dataset.from_json(str(path))
+    ds = Dataset.from_json(str(path))
+    return ds.map(_flatten)
 
 
 def _split_stats(ds: Dataset) -> dict:
@@ -72,15 +85,28 @@ for seq2seq training.
   "id": "ibm_argq_30k_8b4b12caccad",
   "lang": "en",
   "source": "ibm_argq_30k",
+  "is_synthetic": false,
+  "input_stance": "pro",
+  "target_stance": "con",
   "topic": "We should abandon marriage",
   "input_context": "abandoning marriage allows for people to grow as themselves...",
   "target_output": "committment and stability are important in the lives of children...",
   "encoder_input": "We should abandon marriage <SEP> abandoning marriage allows...",
   "decoder_input": "<SOS> committment and stability are important...",
   "decoder_target": "committment and stability are important... <EOS>",
-  "meta": {{ "input_stance": "pro", "target_stance": "con", "is_synthetic": false, "...": "..." }}
+  "meta": {{ "source_record_ids": [], "quality_input_WA": 1.0, "...": "..." }}
 }}
 ```
+
+Top-level fields filterable in the HF dataset viewer:
+
+| Field | Values |
+|---|---|
+| `lang` | `en`, `ko` |
+| `source` | `ibm_argq_30k`, `mc_conversation`, `isotonic_conversation`, `casual_conversation`, `ko_debate_synth`, `korean_petitions` |
+| `is_synthetic` | `true`, `false` |
+| `input_stance` | `pro`, `con`, `petition_position`, `supportive`, `oppositional`, … |
+| `target_stance` | `pro`, `con`, `opposition`, … |
 
 ## Splits
 

@@ -23,7 +23,7 @@ from tqdm import tqdm
 from ._utils import passes_basic_filters
 from .common import make_seq2seq_record, write_jsonl
 
-DATASET_NAME = "klue"
+DATASET_NAME = "klue/klue"
 DATASET_CONFIG = "nli"
 SOURCE = "klue_nli"
 LANG = "ko"
