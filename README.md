@@ -110,6 +110,50 @@ VLLM_API_KEY=EMPTY
 Korean Petitions synth runs ~10K calls with concurrency 16 and chunked writes
 (no progress lost on crash). With Qwen3-235B-A22B on 8 B200s expect ~15–25 min.
 
+## Training the LSTM seq2seq
+
+Two encoder modes; both use a from-scratch LSTM decoder with Bahdanau attention.
+
+```bash
+# 1. Build the SentencePiece BPE vocab (32K, bilingual)
+uv run python -m src.preprocess.build_vocab
+
+# 2a. Phase 2 — BiLSTM encoder + LSTM decoder, ~30M params
+uv run python -m src.train --encoder bilstm --epochs 10 --batch-size 32
+
+# 2b. Phase 2 + FastText embeddings (download cc.en.300.vec, cc.ko.300.vec first)
+uv run python -m src.train --encoder bilstm \
+  --fasttext-en data/raw_manual/fasttext/cc.en.300.vec \
+  --fasttext-ko data/raw_manual/fasttext/cc.ko.300.vec
+
+# 3. Phase 3 — frozen XLM-R-base encoder + LSTM decoder, ~30M trainable
+uv run python -m src.train --encoder xlmr --epochs 5 --batch-size 16
+```
+
+Each run writes to `checkpoints/<encoder>-<timestamp>/`:
+
+- `args.json` — full hyperparameters
+- `history.json` — per-epoch train_loss, valid_loss, perplexity, BLEU
+- `best.pt` — best-BLEU checkpoint
+- `test_metrics.json` — final test-set metrics
+
+### Inference (beam search)
+
+```bash
+uv run python -m src.generate \
+  --checkpoint checkpoints/bilstm-XXXX/best.pt \
+  --topic "안락사 허용" \
+  --input "고통스러운 삶을 강제로 이어가게 하는 것은 비인도적입니다." \
+  --beam-size 4
+```
+
+## Encoder choice — read first
+
+The brief says "LSTM-based seq2seq". The BiLSTM encoder is the strict
+interpretation. The XLM-R encoder + LSTM decoder reads "may add or modify"
+liberally — the decoder is still LSTM, but a transformer encoder may not
+fly with a strict grader. **Verify with the TA before submitting xlmr.**
+
 ## Pushing the dataset to Hugging Face
 
 Once `data/processed/` is populated:
