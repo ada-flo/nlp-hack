@@ -15,8 +15,20 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from pathlib import Path
 from typing import Iterator, List, Tuple
+
+# Korpora uses urllib.request, which on macOS Python does not pick up the
+# system root CA bundle and fails with CERTIFICATE_VERIFY_FAILED. Point at
+# certifi's bundle before importing Korpora.
+try:
+    import certifi
+
+    os.environ.setdefault("SSL_CERT_FILE", certifi.where())
+    os.environ.setdefault("REQUESTS_CA_BUNDLE", certifi.where())
+except ImportError:
+    pass
 
 from Korpora import Korpora
 from tqdm import tqdm
