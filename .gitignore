@@ -3,6 +3,13 @@ data/raw/
 data/raw_manual/
 data/interim/
 
+# Processed split JSONLs are large (~50K records) — regenerate via the
+# pipeline. The trained tokenizer (spm.model) is small and stays committed.
+data/processed/*.jsonl
+
+# Model checkpoints
+checkpoints/
+
 # Bulky archives and tabular dumps.
 *.zip
 *.tar.gz

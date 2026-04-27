@@ -149,8 +149,9 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--interim-dir", type=Path, default=INTERIM_DIR)
     parser.add_argument("--out-dir", type=Path, default=PROCESSED_DIR)
-    parser.add_argument("--cap-en", type=int, default=10_000)
-    parser.add_argument("--cap-ko", type=int, default=10_000)
+    # Default: no cap. Pass --cap-en / --cap-ko to limit per language.
+    parser.add_argument("--cap-en", type=int, default=None)
+    parser.add_argument("--cap-ko", type=int, default=None)
     parser.add_argument("--seed", type=int, default=DEFAULT_SEED)
     args = parser.parse_args()
 
