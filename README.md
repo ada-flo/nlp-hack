@@ -110,6 +110,40 @@ VLLM_API_KEY=EMPTY
 Korean Petitions synth runs ~10K calls with concurrency 16 and chunked writes
 (no progress lost on crash). With Qwen3-235B-A22B on 8 B200s expect ~15–25 min.
 
+## Quick start on a GPU server
+
+If you have already pushed the dataset to HF, the GPU server doesn't need
+to run the preprocess pipeline at all.
+
+```bash
+# 1. clone
+git clone git@github.com:ada-flo/nlp-hack.git && cd nlp-hack
+
+# 2. uv (if missing)
+which uv || curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 3. install deps. uv resolves CUDA-enabled torch on a Linux GPU box.
+uv sync
+
+# 4. (optional) sanity-check torch picked up the GPU
+uv run python -c "import torch; print('cuda:', torch.cuda.is_available(), torch.cuda.device_count())"
+
+# 5. pull the processed dataset from HF (HF_TOKEN read-scope works)
+uv run python scripts/pull_dataset_from_hf.py
+
+# 6. train
+uv run python -m src.train --encoder bilstm --epochs 10 --batch-size 32
+```
+
+The committed `data/processed/spm.model` matches the dataset on HF, so
+you don't need to rerun `build_vocab` unless you regenerated the dataset.
+
+If `torch` resolved to CPU-only, force CUDA:
+
+```bash
+uv pip install --force-reinstall torch --index-url https://download.pytorch.org/whl/cu124
+```
+
 ## Training the LSTM seq2seq
 
 Two encoder modes; both use a from-scratch LSTM decoder with Bahdanau attention.
