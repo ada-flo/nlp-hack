@@ -1,9 +1,9 @@
 # Dataset examples
 
-Random samples (seed=42) from each English interim file after preprocessing.
+Random samples (seed=42) from each interim file after preprocessing.
 These are the records that will be fed into merge_and_split → train/valid/test.
 
-## IBM ArgQ 30K — real debate pairs
+## IBM ArgQ 30K — real debate pairs (EN)
 
 - File: `data/interim/en_ibm_argq.jsonl`
 - Total records: 29,664
@@ -43,7 +43,7 @@ These are the records that will be fed into merge_and_split → train/valid/test
 - **Target**: we shouldn't ban telemarketing because it helps companies obtain more business
 - **Meta**: `input_stance`=pro · `target_stance`=con · `is_synthetic`=False · `quality_input_WA`=0.864556376 · `quality_target_WA`=0.83891061
 
-## mc-ai/conversation_dataset — persuasion-only after filter
+## mc-ai/conversation_dataset — persuasion-only after filter (EN)
 
 - File: `data/interim/en_mc_conversation.jsonl`
 - Total records: 1,500
@@ -83,7 +83,7 @@ These are the records that will be fed into merge_and_split → train/valid/test
 - **Target**: Ok cool, weve got a few more, any other charities
 - **Meta**: `is_synthetic`=False · `conversation_id`=9145 · `corpus_id`=persuasionforgood
 
-## Isotonic/human_assistant_conversation — markers and code filtered
+## Isotonic/human_assistant_conversation — markers and code filtered (EN)
 
 - File: `data/interim/en_isotonic_conversation.jsonl`
 - Total records: 1,500
@@ -123,7 +123,7 @@ These are the records that will be fed into merge_and_split → train/valid/test
 - **Target**: Currency exchange is the process of converting one currency into another currency. It involves the exchange of one currency for another at an agreed rate of exchange. To carry out a currency exchange, you would need to go to a bank, foreign exchange dealer, or a licensed money changer. Here, the exchange rate would be determined and the respective currencies would be exchanged according to that.
 - **Meta**: `is_synthetic`=False
 
-## SohamGhadge/casual-conversation — chit-chat
+## SohamGhadge/casual-conversation — chit-chat (EN)
 
 - File: `data/interim/en_casual_conversation.jsonl`
 - Total records: 1,000
@@ -162,3 +162,43 @@ These are the records that will be fed into merge_and_split → train/valid/test
 - **Input**: i'm really glad that you came to see me.
 - **Target**: i had to. i was missing you a lot.
 - **Meta**: `is_synthetic`=False
+
+## KLUE-NLI — contradiction pairs (KO, no vLLM)
+
+- File: `data/interim/ko_klue_nli.jsonl`
+- Total records: 5,000
+
+### Example 1
+
+- **Topic**: 두 문장의 관점 차이
+- **Input**: 미국여행시 위치가 이보다 더 좋을순 없습니다.
+- **Target**: 로마여행시 위치가 이보다 더 좋을순 없습니다.
+- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+
+### Example 2
+
+- **Topic**: 두 문장의 관점 차이
+- **Input**: 1인별 구매한도를 월 50만원에서 40만원 이내로 줄일 방침이다.
+- **Target**: 1인별 구매한도를 월 50만원에서 100만원 이내로 늘리고 올해 잔여 물량 6조 5000억원을 차질없이 유통할 계획이다.
+- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+
+### Example 3
+
+- **Topic**: 두 문장의 관점 차이
+- **Input**: 그가 만들어준 상그리아는 별로에요.
+- **Target**: 또한 그가 직접 만든 상그리아도 최고예요.
+- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+
+### Example 4
+
+- **Topic**: 두 문장의 관점 차이
+- **Input**: 괴이한 내용과 허접한 구성 참 더러워 보였습니다
+- **Target**: 내용은 괴이했지만 구성은 완벽했습니다.
+- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+
+### Example 5
+
+- **Topic**: 두 문장의 관점 차이
+- **Input**: 또 면회객은 손 소독을 반드시 하고 마스크와 비닐장갑을 착용하며, 기관에서는 발열체크 등 위험요인을 확인하고 출입명부를 비치해 관리해야 한다.
+- **Target**: 면회객은 마스크만 착용하면 된다.
+- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
