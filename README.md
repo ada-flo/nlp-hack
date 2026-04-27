@@ -110,6 +110,22 @@ VLLM_API_KEY=EMPTY
 Korean Petitions synth runs ~10K calls with concurrency 16 and chunked writes
 (no progress lost on crash). With Qwen3-235B-A22B on 8 B200s expect ~15–25 min.
 
+## Pushing the dataset to Hugging Face
+
+Once `data/processed/` is populated:
+
+```bash
+# HF_TOKEN must have WRITE scope (https://huggingface.co/settings/tokens)
+uv run python scripts/push_to_hf.py --repo-id <user>/<dataset-name>
+
+# Private repo:
+uv run python scripts/push_to_hf.py --repo-id <user>/<dataset-name> --private
+```
+
+The script uploads `train` / `validation` / `test` splits as parquet and
+writes a dataset card (`README.md` in the HF repo) with schema, source
+breakdown, and per-split language counts. See `scripts/push_to_hf.py`.
+
 ## Topic-leakage rule
 
 Splits are **topic-level** for debate records (every record on a given motion
