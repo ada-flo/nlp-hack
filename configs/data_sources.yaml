@@ -79,9 +79,15 @@ sources:
       hf_name: raphaaal/schopenhauer-debate
 
   ko:
+    debate_synth:
+      enabled: true              # vLLM-synthesized debate pairs from a motion list
+      kind: topic_seeded_pair
+      seeds_path: data/seeds/ko_debate_motions.txt
+      max_records: 5000
+      requires: vllm
     klue_nli:
-      enabled: true              # no vLLM needed — direct contradiction pairs
-      kind: nli_contradiction_pair
+      enabled: false             # NLI sentence-level contradictions don't match
+      kind: nli_contradiction_pair  # the brief's debate format — kept for reference
       hf_name: klue/klue
       hf_config: nli
       max_records: 5000

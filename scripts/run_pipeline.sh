@@ -30,14 +30,13 @@ uv run python -m src.preprocess.en_casual_conversation
 
 echo
 echo "=== [3/4] KO adapters ==="
-echo "--- KLUE-NLI (programmatic, no vLLM) ---"
-uv run python -m src.preprocess.ko_klue_nli
-
 if [ -n "${VLLM_BASE_URL:-}" ]; then
-  echo "--- Korean Petitions synth (VLLM_BASE_URL=$VLLM_BASE_URL) ---"
+  echo "--- Topic-seeded debate synth (VLLM_BASE_URL=$VLLM_BASE_URL) ---"
+  uv run python -m src.preprocess.ko_debate_synth
+  echo "--- Korean Petitions synth ---"
   uv run python -m src.preprocess.ko_korean_petitions
 else
-  echo "--- Korean Petitions synth: VLLM_BASE_URL not set, skipping ---"
+  echo "--- KO synth steps: VLLM_BASE_URL not set, skipping ---"
 fi
 
 echo "--- Manual-data-gated KO adapters (skip cleanly if data absent) ---"
