@@ -19,6 +19,7 @@ from .common import make_seq2seq_record, write_jsonl
 DATASET = "mc-ai/conversation_dataset"
 SOURCE = "mc_conversation"
 MAX_RECORDS = 1500
+KEEP_CORPORA = {"persuasionforgood"}  # `deli` is logic-puzzle banter, not debate.
 
 
 def _extract_turns(raw_convo: dict) -> List[str]:
@@ -31,6 +32,8 @@ def build_records(max_records: int = MAX_RECORDS) -> List[dict]:
     records: List[dict] = []
 
     for row in tqdm(dataset, desc=SOURCE):
+        if row.get("corpus_id") not in KEEP_CORPORA:
+            continue
         topic = row.get("topic") or "casual conversation"
         turns = _extract_turns(row.get("raw_convo"))
         for prev, nxt in adjacent_pairs(turns):

@@ -19,6 +19,20 @@ SOURCE = "isotonic_conversation"
 TOPIC = "casual conversation"
 MAX_RECORDS = 1500
 
+# Multi-turn rows have these markers baked into the `prompt` column. We reject
+# them rather than try to clean — splitting reliably is hard, and the dataset
+# has plenty of clean single-turn rows.
+DIALOG_MARKERS = ("Human:", "Assistant:")
+CODE_HINTS = ("def ", "import ", "console.log", "function(", "</html", "```")
+
+
+def _has_marker(text: str) -> bool:
+    return any(m in text for m in DIALOG_MARKERS)
+
+
+def _looks_like_code(text: str) -> bool:
+    return any(h in text for h in CODE_HINTS)
+
 
 def _clean_prompt(text: str) -> str:
     # Trailing "Output:" marker is part of the dataset's prompt format.
@@ -26,13 +40,20 @@ def _clean_prompt(text: str) -> str:
 
 
 def build_records(max_records: int = MAX_RECORDS) -> List[dict]:
-    dataset = load_dataset(DATASET, split="train")
+    # Stream to bypass a schema mismatch between train and validation parquet
+    # files that breaks non-streaming load (validation has `source_text`,
+    # train has `text`).
+    dataset = load_dataset(DATASET, split="train", streaming=True)
     records: List[dict] = []
 
-    for row in tqdm(dataset, desc=SOURCE):
+    for row in tqdm(dataset, desc=SOURCE, total=max_records):
         prompt = _clean_prompt(row.get("prompt"))
         response = (row.get("response") or "").strip()
         if not (passes_basic_filters(prompt) and passes_basic_filters(response)):
+            continue
+        if _has_marker(prompt) or _has_marker(response):
+            continue
+        if _looks_like_code(prompt) or _looks_like_code(response):
             continue
         record = make_seq2seq_record(
             lang="en",
