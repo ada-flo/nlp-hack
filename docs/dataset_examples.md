@@ -202,3 +202,43 @@ These are the records that will be fed into merge_and_split → train/valid/test
 - **Input**: 또 면회객은 손 소독을 반드시 하고 마스크와 비닐장갑을 착용하며, 기관에서는 발열체크 등 위험요인을 확인하고 출입명부를 비치해 관리해야 한다.
 - **Target**: 면회객은 마스크만 착용하면 된다.
 - **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+
+## Korean Petitions — vLLM-synthesized rebuttals (KO, Qwen3-235B-A22B)
+
+- File: `data/interim/ko_korean_petitions.jsonl`
+- Total records: 8,197
+
+### Example 1
+
+- **Topic**: 적폐세력1호
+- **Input**: 서광주우체국 故 이길연 집배원 유서 "두렵다 이 아픈 몸 이끌고 출근하라네. 사람 취급 안하네. 가족들 미안해" <전문> * 현 문재인정권과 부르주아정치인들이 미적거리는 사이 여기 노동적폐집합소 우정사업본부 치하에서 집배원이 또 자살했습니다. 올해 열다벗째 우체국노동자. 일하다가 교통사고로 부상당한 공상 집배노동자라면 치료받도록 도움과 지원은 못해줄망정 죽든말든 출근하여 일하라는 서광주우체국 사측계급의 갑질명령은 도저히 있을 수 없는 야만집단으로 드러났습니다.
+- **Target**: 고 이길연 집배원의 비극은 안타깝지만, 이를 '적폐세력'으로 몰아가며 특정 정권이나 정치세력을 일괄적으로 비난하는 것은 문제의 본질을 흐릴 수 있습니다. 노동 현장의 어려움은 개선되어야 할 과제이지만, 정확한 진상 규명과 합리적 대안 없이 감정적 프레임만 앞세우는 접근은 건설적인 해결을 가로막습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=기타 · `num_agree`=1 · `begin`=2017-09-06 · `end`=2017-09-13
+
+### Example 2
+
+- **Topic**: 범죄자는 얼굴을 공개해주세요.
+- **Input**: 범죄자들은 청소년이든 어른이든 얼굴을 공개해 국민들이 안전할 권리를 주시기 바랍니다. 범죄자들이 가장 무서워하는것이 신상공개이고 재범을 막을수 없고 무기징역으로 불리시킬수 없다면 얼굴을 공개해서 국민스스로 자신을 지킬수있는 방법은 범죄자를 스스로 피하는것뿐입니다.
+- **Target**: 범죄자의 얼굴 공개가 재범 방지에 효과적이라는 근거 없이 신상 공개는 오히려 사회적 낙인을 심화시켜 범죄자의 사회 복귀를 더욱 어렵게 만들 수 있습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=안전/환경 · `num_agree`=0 · `begin`=2017-09-05 · `end`=2017-12-04
+
+### Example 3
+
+- **Topic**: 소년범 폐지해주세요
+- **Input**: 소년법 [少年法] 행정/정책 반사회성이 있는 소년에 대해 그 환경의 조정과 성행(性行)의 교정에 관한 보호처분을 하고 형사처분에 관한 특별조치를 함으로써 소년의 건전한 육성을 기하기 위해 제정된 법률이다. 소년들의 건전한 육성을 기하기위해 제정된법이아니라 범죄자를 육성하는 법입니다 폐지해주세요!
+- **Target**: 소년법은 범죄를 조장하기 위한 것이 아니라, 반사회적 행동을 보인 소년이 사회에 다시 적응할 수 있도록 교정하고 보호하기 위한 제도입니다. 폐지보다는 보완을 통해 그 목적에 더 충실할 수 있도록 해야 합니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=인권/성평등 · `num_agree`=4 · `begin`=2017-09-07 · `end`=2017-12-06
+
+### Example 4
+
+- **Topic**: 소년법 폐지되야합니다.
+- **Input**: 옛날이야 아이와 함께 하는 부모님들도 많았고 대가족이여서 예의와 공동체생활 규칙등을 잘 지키고 수행할 수 있다고 생각되어 이법이 있다고 하지만 ... 지금 우리가 살고있는 시대는 점점 개인주의와 소가족으로 구성되고 부모님들은 맞벌이 하러 가기 바쁩니다. 그 상황에서 아이들은 어떻게 그것을 배울 수 있을까요? 인터넷이 점점 발전되면서 법에 않걸리는것도 알아 그런 폭행들을 쉽게 할 수 있다면 그런아이들이 올바르게 자라지 않고 사회에 나면 더 큰 물의를 일으킬 수 있다고 생각합니다.
+- **Target**: 소년법은 잘못을 저지른 청소년에게 엄벌보다는 교육과 재활의 기회를 주기 위해 존재하며, 사회 환경의 변화가 법의 폐지를 정당화하는 이유가 되지 않습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=육아/교육 · `num_agree`=1 · `begin`=2017-09-05 · `end`=2017-12-04
+
+### Example 5
+
+- **Topic**: 공무원연금법
+- **Input**: 법을 제정할때 모든 케이스를 고려하여 세세한 문구까지 박기는 어렵다는 것은 알고있습니다 하지만 재판으로 결과가 나온 세부 케이스의 경우에도 현 공무원연금법의 법대로라면 적용이 불가능하다는 괴리를 알게 된바, 도움을 구하고자 합니다 현 공무원연금법: 수급자(생존해있는 경우) 배우자 분할연금가능 ※생존해있지않다면 재판에서 지급하라는 판결이 나와도 연금공단에선 배우자에게 지불할수없다고 합니다 수정바라는 내용: 수급자의 배우자는 이혼을 하더라도 (사망여부와 상관없이 ) 배우자또한 분할 연금 대상이므로 지
+- **Target**: 현행 공무원연금법은 수급자 사망 시 배우자에게 분할연금을 지급하지 못하도록 규정하고 있으며, 이는 재판의 판결 내용과 법적 적용 사이의 충돌을 야기할 수 있습니다. 그러나 법의 안정성과 예측 가능성을 고려할 때, 개별 판례에 따라 법의 적용을 확장하기보다는 명확한 법 개정을 통해 일관된 기준을 마련하는 것이 타당합니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=보건복지 · `num_agree`=0 · `begin`=2017-08-26 · `end`=2017-09-25
