@@ -114,38 +114,70 @@ These are the records that flow through merge_and_split into train/valid/test.
 - **Target**: i really don't know, but i don't think she gave out that many yet.
 - **Meta**: `is_synthetic`=False
 
-## KLUE-NLI — Korean contradiction pairs (KO, no vLLM)
+## Korean topic-seeded debate synth (KO, Qwen3-235B-A22B)
 
-- File: `data/interim/ko_klue_nli.jsonl`
-- Total records: 5,000
+- File: `data/interim/ko_debate_synth.jsonl`
+- Total records: 5,880  (98 unique motions × ~60 records each)
 
-### Example 1
+Curated motions in `data/seeds/ko_debate_motions.txt`. For each motion the
+LLM produces 30 PRO/CON pairs at temp=0.9; each pair becomes 2 records
+(pro→con and con→pro). Samples below show one motion per category.
 
-- **Topic**: 두 문장의 관점 차이
-- **Input**: 가장 문제가 되는 것은 정보센터를 나가사키 항에 안 만들고 도쿄에 만든 것입니다.
-- **Target**: 정보센터를 도쿄에 만든 것은 전혀 문제가 되지 않습니다.
-- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+### Example 1 — 안락사 허용
 
-### Example 2
+- **Topic**: 안락사 허용
+- **Input**: 말기 환자는 극심한 고통 속에서 존엄한 죽음을 선택할 권리를 가져야 하며, 안락사는 인간다운 삶의 종료를 보장하는 마지막 수단이다.
+- **Target**: 안락사를 허용하면 일시적인 고통이나 우울증으로 판단력이 흐려진 환자가 되돌릴 수 없는 선택을 할 위험이 있으며, 이는 오히려 존엄성을 해칠 수 있다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
 
-- **Topic**: 두 문장의 관점 차이
-- **Input**: 라이브커머스는 행사기간 마지막날에만 진행된다.
-- **Target**: 라이브커머스는 각 지역행사장의 오픈스튜디오 또는 해당 지역 핫스팟에서 행사기간 동안 매일 진행된다.
-- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+### Example 2 — 사형제 폐지
 
-### Example 3
+- **Topic**: 사형제 폐지
+- **Input**: 사형제는 인간의 존엄성을 침해하며, 국가가 공식적으로 생명을 빼앗는 행위는 도덕적으로 정당화될 수 없습니다.
+- **Target**: 사형제는 극악무도한 범죄에 대한 정의 실현 수단으로서, 피해자와 유가족의 권리를 무시할 수 없다는 점에서 존속되어야 합니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
 
-- **Topic**: 두 문장의 관점 차이
-- **Input**: 뉴욕패션위크 리한나 란제리쇼 사진을 모아봤다.
-- **Target**: 리한나의 란제리 쇼 사진은 없다.
-- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+### Example 3 — 기본소득 도입
 
-### Example 4
+- **Topic**: 기본소득 도입
+- **Input**: 기본소득 도입은 모든 시민에게 안정적인 생계 보장을 제공함으로써 빈곤과 사회적 불평등을 완화할 수 있다.
+- **Target**: 그러나 모든 국민에게 무조건 지급하는 기본소득은 재정 부담을 가중시켜 오히려 복지 예산의 축소를 초래할 수 있다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
 
-- **Topic**: 두 문장의 관점 차이
-- **Input**: 2007년, 러시아의 블라디미르 푸틴 대통령이 대사관에 머무르던 당시에도 수류탄이 투척된 적이 있다.
-- **Target**: 대사관에 수류탄이 투척된 적은 없다.
-- **Meta**: `is_synthetic`=False · `conversion`=nli_contradiction_pair · `split`=train
+### Example 4 — 동성결혼 합법화
+
+- **Topic**: 동성결혼 합법화
+- **Input**: 동성결혼의 합법화는 성적 지향에 관계없이 모든 시민이 평등하게 결혼의 권리를 누릴 수 있도록 보장하는 중요한 인권적 조치입니다.
+- **Target**: 그러나 결혼 제도는 전통적으로 가족의 형성과 자녀 양육이라는 사회적 기능을 목적으로 해왔으며, 동성 커플의 결혼 합법화는 이러한 제도의 본질을 훼손할 수 있습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
+
+### Example 5 — 원자력 발전 확대
+
+- **Topic**: 원자력 발전 확대
+- **Input**: 원자력 발전은 온실가스 배출이 적어 기후 변화 대응에 효과적이며, 안정적인 전력 공급이 가능하다.
+- **Target**: 그러나 핵폐기물 처리와 사고 위험 등 안전 문제로 인해 장기적인 환경 피해 가능성이 크며, 이는 기후 혜택을 상쇄할 수 있다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
+
+### Example 6 — 비만세 도입
+
+- **Topic**: 비만세 도입
+- **Input**: 비만세 도입은 건강한 생활습관을 장려하고 비만 관련 의료 비용 증가를 억제하는 데 효과적인 정책 수단이다.
+- **Target**: 비만세는 개인의 건강 상태를 단순히 경제적 부담으로 전환하여 차별을 초래할 수 있으며, 오히려 의료 접근성을 저해할 위험이 있다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
+
+### Example 7 — AI 의료 진단 사용 허용
+
+- **Topic**: AI 의료 진단 사용 허용
+- **Input**: AI 의료 진단은 방대한 의료 데이터를 신속하게 분석하여 조기 진단과 정밀 의료를 가능하게 하므로 환자의 생존율을 높일 수 있다.
+- **Target**: 그러나 AI의 분석이 완전히 신뢰할 수 없다는 점에서, 잘못된 진단이 발생할 위험이 높아져 오히려 환자의 건강에 심각한 피해를 줄 수 있다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
+
+### Example 8 — 개 식용 금지
+
+- **Topic**: 개 식용 금지
+- **Input**: 개는 오랫동안 인간의 동반자로 살아온 반려동물로서, 그 식용은 동물복지의 관점에서 정당화될 수 없다.
+- **Target**: 반려동물과 식용 동물을 구분하는 것은 문화적 맥락에 달려 있으며, 일부 전통을 일괄적으로 금지하는 것은 문화적 다양성을 존중하지 않는 태도다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=pro · `target_stance`=con · `conversion`=topic_seeded_pair
 
 ## Korean Petitions — vLLM-synthesized rebuttals (KO, Qwen3-235B-A22B)
 
@@ -158,49 +190,49 @@ filtered out *here in the showcase only* — they remain in the training data.
 
 ### Example 1 — 안전/환경
 
-- **Topic**: 자연을 깨끗이 합시다.
-- **Input**: 여름철 해수욕장에 피서를 오고 나서 바닷가해변,바닷가 물속,계곡,산속 등에 쓰레기를 버리고 가는 사람들이 많은데요. 저는 제가 사랑하는 해변 한군데를 매년 자원봉사로 수중청소를 하고 있습니다. 모든 사람들이 참가했으면 합니다. 지금 무엇보다 시급한 문제가 북한도발에 대한 강력한 안보문제입니다. 유사시에 북한 김정은을 암살하기 위한 특수부대원을 키워놓게 지금부터 빨리 준비했으면 합니다. 저도 특수부대 나왔지만,실직적인 특수부대원을 만들었으면 합니다.
-- **Target**: 자연 보호와 안보 강화는 서로 배타적인 문제가 아니라 함께 해결해야 할 과제입니다. 제가 사랑하는 해변을 지키는 것처럼, 국가를 지키기 위한 노력도 중요하지만 환경 보전은 지금 당장 우리 일상에서 실천할 수 있는 안보와 같은 필수적 책임입니다.
-- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=안전/환경 · `num_agree`=1 · `begin`=2017-08-29 · `end`=2017-11-27
+- **Topic**: 길거리에서 내가 담배냄새를 느끼고 담배를 꺼달라고 했을때 거부시 벌금을 물게 해주세요
+- **Input**: 말 그대로입니다. 피고 남은 냄새의 잔재는 어쩔 수 없지만 사람이 많은 길거리나 가게 앞, 가게 안, 공공장소 등등 사람이 있는 곳에서 담배를 피우는데 피는 사람은 자유인데 그것을 강제로 맞는 사람은 거부하는 자유는 없습니까? 현 시대에서 담배는 명백하게 사회악입니다. 단속이 안된다는 점에서 마약보다도 더 성질이 나쁜 쓰레기이며 지구의 환경에도 매우 심각한 타격을 주는데 대체 왜 담배가 단속이 안되는지 모르겠습니다.
+- **Target**: 담배 냄새에 대한 불편함은 충분히 이해하지만, 이미 금연 구역을 제외한 곳에서 흡연하는 것은 법적으로 허용된 개인의 선택이며, 그로 인한 미세한 냄새까지 규제하는 것은 과도한 간섭이 될 수 있습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=안전/환경 · `num_agree`=8 · `begin`=2017-09-12 · `end`=2017-12-11
 
 ### Example 2 — 육아/교육
 
-- **Topic**: 기간제교원의 정규직화를 반대합니다
-- **Input**: 안녕하십니까 저는 경남의 공립단설유치원에서 근무하고 있는 교사입니다. 저는 2000년 졸업을 앞두고 공부를 하며 시험을 준비했는데 그 당시에 기간제교원이 정규직교사가 되면서 경남에서 뽑는 교원이 0명이었습니다 정말 충격이었습니다 그래서 어쩔수없이 경기도에 지원을 했고 3년근무한뒤 경남으로 내려올수 있었습니다 그런데 17만년에 또이런일이 생기다니요 제가 그당시에 겪었기에 지금 자신의 삶을 포기한채 2~3년 4~5년을 공부에 매달려있는 사람들은 어떤 심정일지 알것 같습니다 시험과 자격검정절차를 무의미
-- **Target**: 기간제 교원의 정규직 전환은 교육 현장의 안정성과 지속성을 높이기 위한 것이며, 이는 학생들의 권리 보장과도 직결됩니다. 시험 준비의 어려움을 겪은 분들의 사정도 이해하지만, 교직 내 불안정한 고용 구조를 해소하는 것도 중요한 사회적 과제입니다.
-- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=육아/교육 · `num_agree`=4 · `begin`=2017-08-29 · `end`=2017-11-27
+- **Topic**: 학적부 기재관리 관련하여 형사입건, 처벌
+- **Input**: 며칠전 뉴스입니다. 【 앵커멘트 】 서울의 한 고등학교 경시 대회에서 한 학생에게 수상 실적을 몰아준 일이 발생했습니다. 이런 수상 실적은 학생부종합전형에서 중요한 고려 요소입니다. 임성재 기자의 단독 보도입니다. 【 기자 】 서울의 한 고등학교입니다. 지난해, 두 개 교내 경시 대회에서 한 학생에게 상을 몰아준 정황이 포착됐습니다. 당시 진학 지도 담당 교사는 학생들이 진로를 결정하기 위해 스스로 어떤 목표를 세우고 노력했는지를 평가하는 대회에서 한 학생에게 특혜를 줬습니다.
+- **Target**: 학생 한 명에게 상을 몰아준 정황이 보도되었지만, 이는 개별 교사의 부적절한 판단일 수 있으며, 학적부 기재 관리 전반에 대한 형사처벌로 이어져야 할 범죄적 행위임을 직접적으로 보여주진 않습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=육아/교육 · `num_agree`=0 · `begin`=2017-09-18 · `end`=2017-10-18
 
 ### Example 3 — 정치개혁
 
-- **Topic**: 부산여중생폭행사건 이대로 끝나게 하지 말아주세요.
-- **Input**: 소년법 폐지해주시고 가해자들 법에맞게 처벌해주세요. 국민의 청원을 부디 무시하지 말아주세요.
-- **Target**: 소년법 폐지는 성급한 해결책일 수 있으며, 철저한 재발 방지 대책과 교육적 접근이 함께 고려되어야 합니다. 국민의 목소리를 무시하는 것이 아니라, 보다 균형 잡힌 사회적 합의가 필요합니다.
-- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=정치개혁 · `num_agree`=5 · `begin`=2017-09-05 · `end`=2017-12-04
+- **Topic**: 소수의 의견은 전달 되지 않는 것인지요? 청원을 보시는 모든 분들께 동의르 구합니다.
+- **Input**: 청원 화면에 '일정 수준 이상의 추천을 받고 국정 현안으로 분류된 청원에 대해, 가장 책임있는 정부 및 청와대 당국자(장관, 대통령 수석비서관 등)의 답변 을 받을 수 있습니다. '라고 명시 되어 있습니다. 일정이상의 추천이란? 구체적으로 얼마의 추천의 의미하는지 궁급합니다. 이는 해석하기에 따라 소규모 모임은 상대적으로 참여 인원이 적기 때문에, 기회의 평등으로부터 멀어질 수 있다고 생각 합니다. 저희 전국노인요양공동생활가정연합회의 인원은 200명 미만 입니다. 그렇다면.
+- **Target**: 청원 시스템은 일정 수의 추천을 기준으로 답변 대상을 선정하지만, 이는 인원 수보다는 사회적 공감과 관심의 정도를 반영하려는 목적을 가지고 있습니다. 소규모 단체라도 그 청원의 내용이 타당하고 널리 공감받을 수 있다면 충분히 목소리를 전달할 기회가 있습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=정치개혁 · `num_agree`=2 · `begin`=2017-08-28 · `end`=2017-09-27
 
 ### Example 4 — 외교/통일/국방
 
-- **Topic**: 여성도 의무화적 군대 가야합니다
-- **Input**: 여성도 의무적으로 군대를 가야됩니다 남성은 의무적이라 안가고 싶어도 가는 사람이 많지만 되려 여자들은 가고싶지만 대학을 못나왔다는 이유로 또 한 신체적 조건이 안된다는 이유로 차별 당하고 있습니다 언제까지 남녀차별로 살아가야 된다는 말입니까 대학을 못나와 취업을 못하게 하는 이 세상에서 군대에 가고 싶은 어려운 사람들은 그렇게 가지 못하고 그저 하늘에 별 따기 처럼 바라만 보고 있습니다 부디 청와대분들과 대통령님께서는 97년생으로 부터 여자들을 군대에 보내주시기 간곡히 부탁드리며 저는 가정 형편상
-- **Target**: 여성의 군대 복무 의무화는 성별에 따른 신체적 차이와 사회적 여건을 고려하지 않은 일률적인 접근이 될 수 있으며, 대신 다양한 대체 복무 제도를 통해 형평성을 모색하는 것이 더 현실적입니다.
-- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=외교/통일/국방 · `num_agree`=2 · `begin`=2017-09-03 · `end`=2017-12-02
+- **Topic**: 외교/북한 또질문입니다. 한중관계 개선위한 방법
+- **Input**: * 추미애 더불어민주당 대표가 북한의 6차 핵실험 등 한반도 안보위기 국면과 관련해 "북한과 미국에 동시 특사를 파견해 북미-남북 간 투 트랙 대화를 추진하는게 어떻습니까? 추 대표는 열린 교섭단체 대표연설에서 "어느 순간 북·미 간 대화가 열리고 남북 간 대화가 열리는 장래를 준비해야 한다"고 전했습니다.
+- **Target**: 북한과 미국에 동시에 특사를 파견하는 제안은 대화 재개를 위한 의지로 볼 수 있지만, 북한의 핵실험 후에도 명확한 비핵화 조치 없이 대화를 추진하면 제재의 실효성이 약화될 수 있습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=외교/통일/국방 · `num_agree`=0 · `begin`=2017-09-09 · `end`=2017-09-16
 
 ### Example 5 — 보건복지
 
-- **Topic**: 건강보험 가입자격과 외국인 문제....
-- **Input**: 우연히 기사를 보고, 너무도 어처구니없는 현재의 건강보험 가입 규정에 대해 글을 올립니다. 한국의 시민들은 직장을 다니면서 임금을 받으며, 본인이 원하지 않아도 이 건강보험료는 임금에서 강제적으로 공제가 됩니다. 실직상태에서도 지역건강보험공단에서 청구서가 매월 날아오고, 우리들은 납부를 해야만 하죠. 그런데, 한국에 와서 겨우 3개월만 지나면 외국인들도 쉽게 건강보험 가입이 되고 그 이후에는 비싼 수입약도 내국인과 똑같이 100 % 건강보험 급여를 적용받을 수가 있군요.
-- **Target**: 외국인의 건강보험 가입은 단순히 체류 기간만으로 결정되는 것이 아니라, 상당 기간 고용·납부 의무를 이행한 후에야 동등한 혜택을 받을 수 있도록 되어 있으며, 이는 사회적 연대와 포용의 원칙에 기반한 제도입니다.
-- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=보건복지 · `num_agree`=2 · `begin`=2017-09-17 · `end`=2017-10-17
+- **Topic**: 임시 공휴일 및 법정 공휴일은 누구만을 위한 휴일입니까?
+- **Input**: 현재 저는 중소 병원에서 근무중입니다. 제가 다니는 병원은 주 5일제를 가장 하여 평일 하루, 일요일 하루 이런식으로 주휴 약휴가 존재하고 설,추석 및 근로자의 날 이외의 공휴일은 전혀 보장 받지 못하고 오히려 공휴일에는 더욱 출근을 강요하고 있습니다. 그나마 저는 나은 편이라고 생각하는데 일반 중소기업은 야근 강요는 물론 이고 휴일에 출근하여 추가 수당 또한 지급 받지 못하는게 현재 우리나라의 실정입니다.
+- **Target**: 공휴일은 모든 근로자가 공평하게 향유할 수 있어야 하는 권리이며, 의료 현장과 같은 필수 업종에 종사하는 분들의 희생을 전제로 공휴일을 무시해서는 안 됩니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=보건복지 · `num_agree`=2 · `begin`=2017-09-02 · `end`=2017-12-01
 
 ### Example 6 — 일자리
 
-- **Topic**: '지역인재' 수정 및 블라인드 관련 청원
-- **Input**: 지역인재와 관련된 청원이 있어서 글 올립니다. 1. 블라인드 채용을 표방하는 데 지역인재 우대 제도는 폐지하는 게 맞지 않습니까? 이게 '진짜' 블라인드인가요? 2. 블라인드와 지역인재 제도를 병행하는 것까지 양보한다 해도, 현재 공기업 등에서 진행하는 '지역인재'는 수정이 필요합니다. 현재 국가에서 '지역인재'라고 워딩을 해놓은 제도는 제대로 된 지역인재가 아니라고 생각합니다.
-- **Target**: 지역인재 제도는 블라인드 채용의 취지를 해치기보다, 지역 간 불균형을 해소하려는 보완적 정책으로 병행될 수 있으며, 이를 통해 실질적인 기회 균등이 가능해질 수 있습니다.
-- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=일자리 · `num_agree`=420 · `begin`=2017-09-19 · `end`=2017-10-19
+- **Topic**: 블라인드 채용의 역차별 개선
+- **Input**: 최근 일자리와 관련하여 정부에서 지속적으로 관심을 가져준 덕분인지 대기업이나 공공기관에서 긍정적인 신호를 보내고 있습니다. 특히 하반기부터 적용된 블라인드 채용으로 인해 양질의 취업처에 대한 균등한 기회를 보장해주기 위한 시도는 긍정적이라고 생각합니다. 하지만 국정농단으로 인한 어려움이 한창이던 올해 초부터 상대적으로 어려움에 처한 이들이 있습니다. 바로 특성화고에서 한창 취업을 준비중인 3학년 재학생들입니다.
+- **Target**: 블라인드 채용이 균등한 기회를 제공하려는 점은 긍정적이지만, 특성화고 학생들이 기술과 실무 능력을 어필할 수 있는 경로를 제한함으로써 오히려 그들의 경쟁력을 외면하는 결과를 초래하고 있습니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=일자리 · `num_agree`=0 · `begin`=2017-09-15 · `end`=2017-10-15
 
 ### Example 7 — 교통/건축/국토
 
-- **Topic**: 시민의 눈물에 등 돌린 복기왕 아산시장
-- **Input**: 안녕하십니까. 대통령님께 이 내용이 전달되기를 바라는 간절한 마음으로 글을 적습니다. 저는 충청남도 아산시에 거주하고 있는 30대 남자입니다. 저는 2년 전, 충청남도 아산시 풍기동에 새로 들어설 예정인 <이지더원> 이라는 아파트 29평형을 2억 3천 3백만원에 계약했습니다. 초등학교를 품은 아파트, 아산의 강남, 차 없는 단지 등 메리트가 확실해 보이는 아파트였기에 넉넉하지 않은 형편에도 무리를 무릅쓰고 계약을 했었습니다. 분양이 마감된 이후부터, 공사가 조금씩 진전되는 것이 보였습니다.
-- **Target**: 아파트 분양은 개인의 선택과 계약에 기반한 사안으로, 시장이 모든 개별 민원에 개입할 수는 없습니다.
-- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=교통/건축/국토 · `num_agree`=332 · `begin`=2017-08-28 · `end`=2017-09-27
+- **Topic**: 자전거 도로교통법 강화 부탁드립니다
+- **Input**: 현장에서 잡지 못하면 영원히 처벌이 불가능한 자전거뻉소니! 자전거도 도로를 달리고싶으면 번호판을 의무화 해야합니다!
+- **Target**: 번호판 의무화보다는 공익제보 앱 활성화와 단속 인력 확충으로 실질적인 단속을 강화하는 것이 더 현실적인 해결책입니다.
+- **Meta**: `is_synthetic`=True · `synthesis_prompt_version`=v1 · `input_stance`=petition_position · `target_stance`=opposition · `category`=교통/건축/국토 · `num_agree`=1 · `begin`=2017-09-14 · `end`=2017-12-13
