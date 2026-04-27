@@ -82,22 +82,31 @@ def _cap_per_language(
     return out
 
 
-CASUAL_TOPIC = "casual conversation"
+# Sources that use a single uniform placeholder topic across all records.
+# These should be split row-wise — the topic field is a control code, not
+# a debate motion, so there's no leakage risk and we want even spread.
+ROW_WISE_SOURCES = frozenset(
+    {
+        "casual_conversation",
+        "isotonic_conversation",
+        "klue_nli",
+    }
+)
 
 
 def _split_key(record: dict) -> tuple:
     """Group records that should never be separated.
 
     Debate records share a topic = the debate motion, so all records on one
-    motion go into a single split (prevents leakage). Casual records share a
-    placeholder topic; they have no leakage risk, so split row-wise via the
-    record id to spread them evenly across train/valid/test.
+    motion go into a single split (prevents leakage). Sources with uniform
+    placeholder topics (casual chat, NLI contradiction pairs) split row-wise
+    via the record id to spread them across train/valid/test.
     """
     lang = record.get("lang", "unk")
-    topic = record.get("topic", "")
-    if topic == CASUAL_TOPIC:
-        return (lang, "_casual", record.get("id", ""))
-    return (lang, topic)
+    source = record.get("source", "")
+    if source in ROW_WISE_SOURCES:
+        return (lang, f"_rowwise_{source}", record.get("id", ""))
+    return (lang, record.get("topic", ""))
 
 
 def _topic_level_split(
