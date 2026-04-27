@@ -40,6 +40,7 @@ Target: ~10K English + ~10K Korean records.
 | EN | mc-ai/conversation_dataset | 1,500 | real dialogue | HF only |
 | EN | Isotonic/human_assistant_conversation | 1,500 | real dialogue | HF only |
 | EN | SohamGhadge/casual-conversation | 1,000 | real dialogue | HF only |
+| KO | KLUE-NLI (HF) | 5,000 | NLI contradiction pairs | HF only (no vLLM) |
 | KO | Korean Petitions (Korpora) | 10,000 | vLLM-synth rebuttal | **vLLM running** |
 | KO | K-News-Stance | best-effort | real stance pairs | manual download |
 | KO | AI Hub Dialogue Summarization | best-effort | real dialogue | manual download |
@@ -53,6 +54,9 @@ uv run python -m src.preprocess.en_ibm_argq
 uv run python -m src.preprocess.en_mc_conversation
 uv run python -m src.preprocess.en_isotonic_conversation
 uv run python -m src.preprocess.en_casual_conversation
+
+# Korean — runs without vLLM, fast Korean baseline
+uv run python -m src.preprocess.ko_klue_nli
 
 # Korean — start vLLM first (see "Synthetic data via vLLM" below)
 uv run python -m src.preprocess.ko_korean_petitions

@@ -79,6 +79,12 @@ sources:
       hf_name: raphaaal/schopenhauer-debate
 
   ko:
+    klue_nli:
+      enabled: true              # no vLLM needed — direct contradiction pairs
+      kind: nli_contradiction_pair
+      hf_name: klue/klue
+      hf_config: nli
+      max_records: 5000
     korean_petitions:
       enabled: true
       kind: issue_to_synthetic_rebuttal
