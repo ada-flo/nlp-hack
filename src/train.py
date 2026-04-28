@@ -129,6 +129,8 @@ def main() -> None:
                         help="Path to cc.ko.300.vec (BiLSTM only)")
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
     parser.add_argument("--run-name", default=None)
+    parser.add_argument("--init-from", type=Path, default=None,
+                        help="Warm-start model weights from a previous best.pt (optimizer reset)")
     args = parser.parse_args()
 
     args.out_dir.mkdir(parents=True, exist_ok=True)
@@ -174,6 +176,13 @@ def main() -> None:
                 model.encoder.embedding.weight.copy_(init.to(args.device))
                 # decoder shares the same embedding when bilstm — already updated.
             print(f"[train] FastText embeddings initialized from {[str(p) for p in vec_paths]}")
+
+    if args.init_from is not None:
+        ckpt = torch.load(args.init_from, map_location=args.device, weights_only=False)
+        missing, unexpected = model.load_state_dict(ckpt["model_state"], strict=False)
+        print(f"[train] init from {args.init_from}  "
+              f"prev_epoch={ckpt.get('epoch')} prev_bleu={ckpt.get('valid', {}).get('bleu')}  "
+              f"missing={len(missing)} unexpected={len(unexpected)}")
 
     n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"[train] trainable params: {n_params:,}")
