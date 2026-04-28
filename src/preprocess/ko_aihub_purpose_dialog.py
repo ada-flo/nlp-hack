@@ -1,19 +1,22 @@
-"""AI Hub Topic-wise Everyday Text Dialogue (dataSetSn=543) → seq2seq pairs.
+"""AI Hub Purpose-Specific Dialogue (dataSetSn=544) → seq2seq pairs.
 
-Schema in this distribution:
+Goal-oriented call-center / counter dialogue across shopping / civil-complaint /
+education / tourism domains.
+
+Schema:
 
     {
       "info": [{
         "annotations": {
-          "subject": "교육",
-          "speaker_type": "1:1",
-          "text": "1 : ...\\n2 : ...\\n3 : ..."
+          "subject": "제품/사용문의",
+          "lines": [
+            {"text": "A.반갑습니다 ...", "speaker": {"id": "A"}, "speechAct": "인사하기"},
+            {"text": "B.문의 좀 ...",   "speaker": {"id": "B"}, "speechAct": "질문하기"},
+            ...
+          ]
         }
       }]
     }
-
-The `text` field is a single string with `<speaker_id> : <utterance>` per line.
-Consecutive same-speaker lines are merged before pairing.
 """
 
 from __future__ import annotations
@@ -30,22 +33,13 @@ from ._utils import (
 )
 from .common import make_seq2seq_record, write_jsonl
 
-SOURCE = "aihub_topic_dialogue"
+SOURCE = "aihub_purpose_dialog"
 LANG = "ko"
-RAW_DIR = Path("data/raw_manual/aihub/topic_dialogue")
-OUTPUT = Path("data/interim/ko_aihub_topic_dialogue.jsonl")
+RAW_DIR = Path("data/raw_manual/aihub/purpose_dialog_544")
+OUTPUT = Path("data/interim/ko_aihub_purpose_dialog.jsonl")
 
-LINE_RE = re.compile(r"^\s*(\S+)\s*:\s*(.+?)\s*$")
-
-
-def _parse_text(text: str) -> list[tuple[str, str]]:
-    pairs: list[tuple[str, str]] = []
-    for line in (text or "").split("\n"):
-        m = LINE_RE.match(line)
-        if not m:
-            continue
-        pairs.append((m.group(1), m.group(2)))
-    return pairs
+# Lines are prefixed with "A." / "B." in the raw text — strip that prefix.
+PREFIX_RE = re.compile(r"^\s*[A-Z]\.\s*")
 
 
 def _walk(raw_dir: Path) -> Iterator[dict]:
@@ -56,6 +50,22 @@ def _walk(raw_dir: Path) -> Iterator[dict]:
             print(f"[{SOURCE}] could not read {path}: {exc!r}")
 
 
+def _extract(data: dict) -> tuple[str, list[tuple[str, str]]]:
+    info = data.get("info") or []
+    if not info:
+        return "", []
+    ann = (info[0] or {}).get("annotations") or {}
+    topic = ann.get("subject") or "목적 대화"
+    lines = ann.get("lines") or []
+    pairs: list[tuple[str, str]] = []
+    for ln in lines:
+        text = PREFIX_RE.sub("", (ln.get("text") or "").strip())
+        spk = ((ln.get("speaker") or {}).get("id")) or ""
+        if text:
+            pairs.append((spk, text))
+    return str(topic), pairs
+
+
 def build_records(raw_dir: Path = RAW_DIR) -> List[dict]:
     if not raw_dir.exists():
         print(f"[{SOURCE}] manual data not found at {raw_dir} — skipping.")
@@ -63,19 +73,15 @@ def build_records(raw_dir: Path = RAW_DIR) -> List[dict]:
 
     records: List[dict] = []
     for data in _walk(raw_dir):
-        info = data.get("info") or []
-        if not info:
-            continue
-        ann = (info[0] or {}).get("annotations") or {}
-        topic = ann.get("subject") or "일상 대화"
-        turns = merge_speaker_turns(_parse_text(ann.get("text") or ""))
+        topic, pairs = _extract(data)
+        turns = merge_speaker_turns(pairs)
         for prev, nxt in adjacent_pairs(turns):
             if not (passes_basic_filters(prev) and passes_basic_filters(nxt)):
                 continue
             record = make_seq2seq_record(
                 lang=LANG,
                 source=SOURCE,
-                topic=str(topic),
+                topic=topic,
                 input_context=prev,
                 target_output=nxt,
                 meta={"is_synthetic": False},

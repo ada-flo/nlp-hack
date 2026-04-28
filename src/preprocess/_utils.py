@@ -78,6 +78,25 @@ def adjacent_pairs(turns: list[str]) -> Iterator[tuple[str, str]]:
         yield turns[i], turns[i + 1]
 
 
+def merge_speaker_turns(pairs: list[tuple[str, str]]) -> list[str]:
+    """Collapse consecutive turns from the same speaker into one merged turn.
+
+    Input: [(speaker_id, text), ...]. Output: [merged_text, ...] alternating speakers.
+    """
+    out: list[str] = []
+    last_spk: str | None = None
+    for spk, text in pairs:
+        text = (text or "").strip()
+        if not text:
+            continue
+        if spk == last_spk and out:
+            out[-1] = (out[-1] + " " + text).strip()
+        else:
+            out.append(text)
+            last_spk = spk
+    return out
+
+
 # --- dedup ---------------------------------------------------------------
 
 def normalize_for_dedup(text: str) -> str:
