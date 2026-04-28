@@ -31,3 +31,7 @@ venv/
 .DS_Store
 .idea/
 .vscode/
+
+# Local tooling / per-machine config
+.bin/
+.claude/
