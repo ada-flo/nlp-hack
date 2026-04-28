@@ -36,8 +36,8 @@ LANG = "ko"
 SEEDS_PATH = Path("data/seeds/ko_debate_motions.txt")
 OUTPUT = Path("data/interim/ko_debate_synth.jsonl")
 
-PAIRS_PER_MOTION = 30  # 30 pairs × 98 motions × 2 directions ≈ 5,880 records
-CONCURRENCY = 16
+PAIRS_PER_MOTION = 60  # 60 pairs × 98 motions × 2 directions ≈ 11,760 records
+CONCURRENCY = 32
 MAX_TOKENS = 240
 TEMPERATURE = 0.9  # high for variety across pairs on the same motion
 
