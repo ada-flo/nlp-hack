@@ -1,0 +1,31 @@
+==============================================================================
+  Debate Battle LSTM Seq2Seq — checkpoint: checkpoints/xlmr-1777348083/best.pt
+  Encoder: frozen XLM-RoBERTa-base | Decoder: LSTM + attention
+  Test BLEU: 3.128
+==============================================================================
+
+[1] TOPIC : 안락사 허용
+    PRO   : 고통스러운 삶을 강제로 이어가게 하는 것은 비인도적입니다.
+    CON ↓ : 법이 아니라 청소년의 회복과 재활을 목적으로 하는 제도이며, 일부 사례로 인해 전체 제도를 폐지하는 것은 근본적인 해결책이 아닙니다. 오히려 교육과 예방 중심의 접근이 더 효과적일 수 있습니다.
+
+[2] TOPIC : 재택근무는 직장 내 생산성 향상에 기여한다.
+    PRO   : 재택근무는 직원에게 자율성을 주어 업무 몰입도를 높이고 출퇴근 스트레스를 줄여준다.
+    CON ↓ : 그러나 재택근무는 팀 간 소통과 생산성 저하를 초래할 수 있으며, 이로 인해 오히려 업무 효율성을 저해할 수 있다.
+
+[3] TOPIC : 자전거 전용도로 확충은 도시 교통 문제 해결에 가장 효과적인 방안이다.
+    PRO   : 자전거 전용도로를 늘리면 친환경 이동수단 이용이 증가해 차량 통행량과 교통 혼잡이 줄어든다.
+    CON ↓ : 자전거 도로 확대는 도로 공간을 축소시켜 오히려 자동차 정체를 심화시킬 수 있으며, 오히려 도시 교통 흐름을 저해할 수 있다.
+
+[4] TOPIC : Legalization of Euthanasia
+    PRO   : It is inhumane to force someone to continue a life full of suffering.
+    CON ↓ : we should not legalize the organ trade because it is a way for people to be able to do so when they do not have the right to do so.
+
+[5] TOPIC : We should ban single-use plastics.
+    PRO   : Single-use plastics are a major source of ocean pollution and harm wildlife.
+    CON ↓ : we should not legalize the organ trade because it is a great way for people to be able to make their own decision.
+
+[6] TOPIC : 정기적인 건강검진은 모든 성인에게 의무화되어야 한다.
+    PRO   : 조기에 질병을 발견하면 의료비를 절감하고 국민 건강 수준을 향상시킬 수 있다.
+    CON ↓ : 그러나 모든 국민에게 무조건 지급되는 기본소득은 재정 부담을 가중시킬 수 있으며, 오히려 의료 자원의 비효율적 분배를 초래할 수 있다.
+
+==============================================================================
